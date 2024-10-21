@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
 import InventoryManagement from './components/InventoryManagement';
@@ -13,15 +14,41 @@ import SalesByClientReport from './components/SalesByClientReport';
 import ClientReport from './components/ClientReport';
 import AccountsReceivableManagement from './components/AccountsReceivableManagement';
 import ProtectedRoute from './components/ProtectedRoute';
+import Register from './components/Register';
+import ForgotPassword from './components/ForgotPassword';
+
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: '#00796b',
+    },
+    secondary: {
+      main: '#c62828',
+    },
+  },
+});
 
 function App() {
   return (
+  <ThemeProvider theme={theme}>
     <Router>
       <Routes>
         <Route 
         path="/login" 
         element={
         <Login />
+          } 
+        />
+        <Route 
+        path="/register" 
+        element={
+        <Register />
+          } 
+        />
+        <Route 
+        path="/forgot-password" 
+        element={
+        <ForgotPassword />
           } 
         />
         <Route
@@ -115,6 +142,7 @@ function App() {
         />
       </Routes>
     </Router>
+    </ThemeProvider>
   );
 }
 

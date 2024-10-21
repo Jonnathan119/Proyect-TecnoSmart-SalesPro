@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import {
+  Box, Button, Card, CardContent, TextField, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Alert, CircularProgress,
+} from '@mui/material';
 
 function MonthlySalesReport() {
   const [year, setYear] = useState('');
@@ -26,7 +29,6 @@ function MonthlySalesReport() {
     }
   };
 
-  // Función para exportar a Excel
   const exportToExcel = async () => {
     try {
       const response = await axios.get(`${API_URL}/reports/sales/monthly/excel`, {
@@ -45,7 +47,6 @@ function MonthlySalesReport() {
     }
   };
 
-  // Función para exportar a PDF
   const exportToPDF = async () => {
     try {
       const response = await axios.get(`${API_URL}/reports/sales/monthly/pdf`, {
@@ -65,65 +66,122 @@ function MonthlySalesReport() {
   };
 
   return (
-    <div>
-      <h2>Informe de Ventas Mensuales</h2>
-      <input 
-        type="number" 
-        placeholder="Año" 
-        value={year} 
-        onChange={(e) => setYear(e.target.value)} 
-        min="2000" 
-        max="2100"
-      />
-      <input 
-        type="number" 
-        placeholder="Mes (1-12)" 
-        value={month} 
-        onChange={(e) => setMonth(e.target.value)} 
-        min="1" 
-        max="12"
-      />
-      <button onClick={fetchMonthlySales} disabled={loading}>
-        {loading ? 'Cargando...' : 'Buscar'}
-      </button>
+    <div
+      style={{
+        minHeight: '100vh',
+        backgroundImage: 'url(/images/background.jpg)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundColor: 'rgba(0, 128, 128, 0.6)',
+        backgroundBlendMode: 'overlay',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: '20px',
+      }}
+    >
+      <Card
+        sx={{
+          maxWidth: 800,
+          width: '100%',
+          backgroundColor: 'rgba(0, 0, 0, 0.7)',
+          color: '#fff',
+          boxShadow: '0px 4px 15px rgba(0, 0, 0, 0.5)',
+          padding: '20px',
+        }}
+      >
+        <CardContent>
+          <Typography variant="h5" align="center" gutterBottom>
+            Informe de Ventas Mensuales
+          </Typography>
+          <Box sx={{ display: 'flex', gap: 2, mt: 2, mb: 2 }}>
+            <TextField
+              label="Año"
+              type="number"
+              value={year}
+              onChange={(e) => setYear(e.target.value)}
+              variant="outlined"
+              fullWidth
+              InputProps={{ style: { backgroundColor: 'rgba(255, 255, 255, 0.1)', color: '#fff' } }}
+              InputLabelProps={{ shrink: true, style: { color: '#ccc' } }}
+              inputProps={{ min: 2000, max: 2100 }}
+            />
+            <TextField
+              label="Mes (1-12)"
+              type="number"
+              value={month}
+              onChange={(e) => setMonth(e.target.value)}
+              variant="outlined"
+              fullWidth
+              InputProps={{ style: { backgroundColor: 'rgba(255, 255, 255, 0.1)', color: '#fff' } }}
+              InputLabelProps={{ shrink: true, style: { color: '#ccc' } }}
+              inputProps={{ min: 1, max: 12 }}
+            />
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={fetchMonthlySales}
+              disabled={loading || !year || !month}
+              sx={{ backgroundColor: '#00796b' }}
+            >
+              {loading ? <CircularProgress size={24} sx={{ color: '#fff' }} /> : 'Buscar'}
+            </Button>
+          </Box>
 
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+          {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
 
-      {sales.length > 0 && (
-        <div>
-          <table>
-            <thead>
-              <tr>
-                <th>ID Venta</th>
-                <th>Cliente</th>
-                <th>Producto</th>
-                <th>Cantidad</th>
-                <th>Total</th>
-                <th>Fecha</th>
-              </tr>
-            </thead>
-            <tbody>
-              {sales.map((sale) => (
-                <tr key={sale.sale_id}>
-                  <td>{sale.sale_id}</td>
-                  <td>{sale.client_name}</td>
-                  <td>{sale.product_name}</td>
-                  <td>{sale.quantity}</td>
-                  <td>{sale.total_price}</td>
-                  <td>{sale.sale_date}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          {sales.length > 0 && (
+            <>
+              <TableContainer component={Paper} sx={{ backgroundColor: 'rgba(0, 0, 0, 0.6)', mt: 2 }}>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell sx={{ color: '#80cbc4' }}>ID Venta</TableCell>
+                      <TableCell sx={{ color: '#80cbc4' }}>Cliente</TableCell>
+                      <TableCell sx={{ color: '#80cbc4' }}>Producto</TableCell>
+                      <TableCell sx={{ color: '#80cbc4' }}>Cantidad</TableCell>
+                      <TableCell sx={{ color: '#80cbc4' }}>Total</TableCell>
+                      <TableCell sx={{ color: '#80cbc4' }}>Fecha</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {sales.map((sale) => (
+                      <TableRow key={sale.sale_id}>
+                        <TableCell sx={{ color: '#fff' }}>{sale.sale_id}</TableCell>
+                        <TableCell sx={{ color: '#fff' }}>{sale.client_name}</TableCell>
+                        <TableCell sx={{ color: '#fff' }}>{sale.product_name}</TableCell>
+                        <TableCell sx={{ color: '#fff' }}>{sale.quantity}</TableCell>
+                        <TableCell sx={{ color: '#fff' }}>{sale.total_price}</TableCell>
+                        <TableCell sx={{ color: '#fff' }}>{sale.sale_date}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
 
-          <div>
-            <button onClick={exportToExcel}>Exportar a Excel</button>
-            <button onClick={exportToPDF}>Exportar a PDF</button>
-          </div>
-        </div>
-      )}
+              <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
+                <Button
+                  variant="contained"
+                  onClick={exportToExcel}
+                  sx={{ backgroundColor: '#4caf50' }}
+                >
+                  Exportar a Excel
+                </Button>
+                <Button
+                  variant="contained"
+                  onClick={exportToPDF}
+                  sx={{ backgroundColor: '#d32f2f' }}
+                >
+                  Exportar a PDF
+                </Button>
+              </Box>
+            </>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }
 
 export default MonthlySalesReport;
+

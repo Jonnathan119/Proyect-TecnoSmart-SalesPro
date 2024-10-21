@@ -1,34 +1,27 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useNavigate, Link } from 'react-router-dom';
 import {
   Box, Button, Card, CardContent, TextField, Typography, Alert,
 } from '@mui/material';
 
-function Login() {
+function ForgotPassword() {
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [message, setMessage] = useState('');
   const [error, setError] = useState('');
-  const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
+  const handleForgotPassword = async (e) => {
     e.preventDefault();
+    setMessage('');
+    setError('');
 
     try {
-      const response = await axios.post('http://localhost:5002/api/auth/login', {
+      await axios.post('http://localhost:5002/api/auth/forgot-password', {
         email,
-        password,
       });
 
-      const { token, user } = response.data;
-
-      // Guardar el token en localStorage
-      localStorage.setItem('token', token);
-
-      // Redirigir al dashboard
-      navigate('/dashboard');
+      setMessage('Se ha enviado un correo para restablecer la contraseña.');
     } catch (err) {
-      setError('Credenciales incorrectas');
+      setError('Error al enviar el correo. Verifique su email.');
     }
   };
 
@@ -58,9 +51,9 @@ function Login() {
       >
         <CardContent>
           <Typography variant="h5" align="center" gutterBottom>
-            Inicio de Sesión
+            Recuperar Contraseña
           </Typography>
-          <form onSubmit={handleLogin}>
+          <form onSubmit={handleForgotPassword}>
             <TextField
               label="Email"
               type="email"
@@ -74,19 +67,7 @@ function Login() {
                 style: { color: '#fff', backgroundColor: 'rgba(255, 255, 255, 0.1)' },
               }}
             />
-            <TextField
-              label="Contraseña"
-              type="password"
-              variant="outlined"
-              fullWidth
-              margin="normal"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              InputLabelProps={{ style: { color: '#ccc' } }}
-              InputProps={{
-                style: { color: '#fff', backgroundColor: 'rgba(255, 255, 255, 0.1)' },
-              }}
-            />
+            {message && <Alert severity="success" sx={{ mt: 2 }}>{message}</Alert>}
             {error && <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>}
             <Button
               type="submit"
@@ -95,31 +76,13 @@ function Login() {
               fullWidth
               sx={{ mt: 3, backgroundColor: '#00796b' }}
             >
-              Iniciar Sesión
+              Enviar Instrucciones
             </Button>
           </form>
-          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
-            <Button
-              onClick={() => navigate('/register')}
-              variant="text"
-              sx={{ color: '#80cbc4' }}
-            >
-              Crear una cuenta en Tecnosmart:
-            </Button>
-          </Box>
-          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
-            <Button
-              onClick={() => navigate('/forgot-password')}
-              variant="text"
-              sx={{ color: '#80cbc4' }}
-            >
-              Recuperar contraseña:
-            </Button>
-          </Box>
         </CardContent>
       </Card>
     </div>
   );
 }
 
-export default Login;
+export default ForgotPassword;

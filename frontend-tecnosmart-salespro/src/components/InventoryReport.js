@@ -3,10 +3,14 @@ import axios from 'axios';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
+import {
+  Box, Button, Card, CardContent, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Alert,
+} from '@mui/material';
 
 function InventoryReport() {
   const [lowStockProducts, setLowStockProducts] = useState([]);
   const [inventory, setInventory] = useState([]);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     fetchLowStockReport();
@@ -19,6 +23,7 @@ function InventoryReport() {
       setLowStockProducts(response.data);
     } catch (error) {
       console.error('Error al obtener productos con bajo stock:', error);
+      setError('No se pudo obtener la lista de productos con bajo stock.');
     }
   };
 
@@ -28,14 +33,14 @@ function InventoryReport() {
       setInventory(response.data);
     } catch (error) {
       console.error('Error al obtener el estado del inventario:', error);
+      setError('No se pudo obtener el estado general del inventario.');
     }
   };
 
-  // Función para exportar el estado del inventario a PDF
   const exportToPDF = () => {
     const doc = new jsPDF();
     doc.text('Estado General del Inventario', 10, 10);
-    
+
     const tableColumn = ["ID", "Producto", "Cantidad", "Precio Unitario", "Valor Total"];
     const tableRows = inventory.map((product) => [
       product.id,
@@ -54,66 +59,120 @@ function InventoryReport() {
     doc.save('inventario.pdf');
   };
 
-  // Función para exportar el estado del inventario a Excel
   const exportToExcel = () => {
     const worksheet = XLSX.utils.json_to_sheet(inventory);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Inventario');
-
     XLSX.writeFile(workbook, 'inventario.xlsx');
   };
 
   return (
-    <div>
-      <h2>Productos con Bajo Stock</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Producto</th>
-            <th>Cantidad</th>
-            <th>Precio</th>
-          </tr>
-        </thead>
-        <tbody>
-          {lowStockProducts.map((product) => (
-            <tr key={product.id}>
-              <td>{product.id}</td>
-              <td>{product.name}</td>
-              <td>{product.quantity}</td>
-              <td>{product.price}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <div
+      style={{
+        minHeight: '100vh',
+        backgroundImage: 'url(/images/background.jpg)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundColor: 'rgba(0, 128, 128, 0.6)',
+        backgroundBlendMode: 'overlay',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: '20px',
+      }}
+    >
+      <Card
+        sx={{
+          maxWidth: 900,
+          width: '100%',
+          backgroundColor: 'rgba(0, 0, 0, 0.7)',
+          color: '#fff',
+          boxShadow: '0px 4px 15px rgba(0, 0, 0, 0.5)',
+          padding: '20px',
+        }}
+      >
+        <CardContent>
+          <Typography variant="h5" align="center" gutterBottom>
+            Informe de Inventario
+          </Typography>
 
-      <h2>Estado General del Inventario</h2>
-      <button onClick={exportToPDF}>Exportar a PDF</button>
-      <button onClick={exportToExcel}>Exportar a Excel</button>
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Producto</th>
-            <th>Cantidad</th>
-            <th>Precio Unitario</th>
-            <th>Valor Total</th>
-          </tr>
-        </thead>
-        <tbody>
-          {inventory.map((product) => (
-            <tr key={product.id}>
-              <td>{product.id}</td>
-              <td>{product.name}</td>
-              <td>{product.quantity}</td>
-              <td>{product.price}</td>
-              <td>{product.total_value}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+          {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+
+          <Typography variant="h6" sx={{ mt: 2 }}>
+            Productos con Bajo Stock
+          </Typography>
+          <TableContainer component={Paper} sx={{ backgroundColor: 'rgba(0, 0, 0, 0.6)', mt: 1 }}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell sx={{ color: '#80cbc4' }}>ID</TableCell>
+                  <TableCell sx={{ color: '#80cbc4' }}>Producto</TableCell>
+                  <TableCell sx={{ color: '#80cbc4' }}>Cantidad</TableCell>
+                  <TableCell sx={{ color: '#80cbc4' }}>Precio</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {lowStockProducts.map((product) => (
+                  <TableRow key={product.id}>
+                    <TableCell sx={{ color: '#fff' }}>{product.id}</TableCell>
+                    <TableCell sx={{ color: '#fff' }}>{product.name}</TableCell>
+                    <TableCell sx={{ color: '#fff' }}>{product.quantity}</TableCell>
+                    <TableCell sx={{ color: '#fff' }}>{product.price}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+
+          <Typography variant="h6" sx={{ mt: 4 }}>
+            Estado General del Inventario
+          </Typography>
+          <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+            <Button
+              variant="contained"
+              onClick={exportToPDF}
+              sx={{ backgroundColor: '#d32f2f' }}
+            >
+              Exportar a PDF
+            </Button>
+            <Button
+              variant="contained"
+              onClick={exportToExcel}
+              sx={{ backgroundColor: '#4caf50' }}
+            >
+              Exportar a Excel
+            </Button>
+          </Box>
+
+          <TableContainer component={Paper} sx={{ backgroundColor: 'rgba(0, 0, 0, 0.6)', mt: 1 }}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell sx={{ color: '#80cbc4' }}>ID</TableCell>
+                  <TableCell sx={{ color: '#80cbc4' }}>Producto</TableCell>
+                  <TableCell sx={{ color: '#80cbc4' }}>Cantidad</TableCell>
+                  <TableCell sx={{ color: '#80cbc4' }}>Precio Unitario</TableCell>
+                  <TableCell sx={{ color: '#80cbc4' }}>Valor Total</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {inventory.map((product) => (
+                  <TableRow key={product.id}>
+                    <TableCell sx={{ color: '#fff' }}>{product.id}</TableCell>
+                    <TableCell sx={{ color: '#fff' }}>{product.name}</TableCell>
+                    <TableCell sx={{ color: '#fff' }}>{product.quantity}</TableCell>
+                    <TableCell sx={{ color: '#fff' }}>{product.price}</TableCell>
+                    <TableCell sx={{ color: '#fff' }}>{product.total_value}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </CardContent>
+      </Card>
     </div>
   );
 }
 
 export default InventoryReport;
+

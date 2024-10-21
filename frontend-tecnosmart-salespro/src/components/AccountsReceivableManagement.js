@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import {
+  Box, Button, Card, CardContent, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TextField, Alert,
+} from '@mui/material';
 
 function AccountsReceivableManagement() {
   const [accounts, setAccounts] = useState([]);
@@ -19,6 +22,7 @@ function AccountsReceivableManagement() {
       setAccounts(response.data);
     } catch (error) {
       console.error('Error al obtener informe de cuentas por cobrar:', error);
+      setError('No se pudo obtener el informe de cuentas por cobrar.');
     }
   };
 
@@ -32,11 +36,11 @@ function AccountsReceivableManagement() {
       await axios.post('http://localhost:5002/api/accounts/payment', {
         account_id: accountId,
         amount_paid: parseFloat(amountPaid),
-        payment_date: paymentDate
+        payment_date: paymentDate,
       });
       alert('Pago registrado exitosamente');
-      fetchAccountsReceivableReport(); 
-      fetchPaymentHistory(accountId);  
+      fetchAccountsReceivableReport();
+      fetchPaymentHistory(accountId);
       setAmountPaid('');
       setPaymentDate('');
     } catch (error) {
@@ -52,76 +56,130 @@ function AccountsReceivableManagement() {
       setSelectedAccountId(accountId);
     } catch (error) {
       console.error('Error al obtener el historial de pagos:', error);
+      setError('No se pudo obtener el historial de pagos.');
     }
   };
 
   return (
-    <div>
-      <h2>Gestión de Cartera</h2>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      
-      <h3>Informe de Cuentas por Cobrar</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>ID Cliente</th>
-            <th>Nombre</th>
-            <th>Saldo Pendiente</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {accounts.map((account) => (
-            <tr key={account.client_id}>
-              <td>{account.client_id}</td>
-              <td>{account.name}</td>
-              <td>{account.balance}</td>
-              <td>
-                <input
-                  type="number"
-                  placeholder="Monto del Pago"
-                  value={amountPaid}
-                  onChange={(e) => setAmountPaid(e.target.value)}
-                />
-                <input
-                  type="date"
-                  placeholder="Fecha de Pago"
-                  value={paymentDate}
-                  onChange={(e) => setPaymentDate(e.target.value)}
-                />
-                <button onClick={() => handlePayment(account.client_id)}>Registrar Pago</button>
-                <button onClick={() => fetchPaymentHistory(account.client_id)}>Ver Historial de Pagos</button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <div
+      style={{
+        minHeight: '100vh',
+        backgroundImage: 'url(/images/background.jpg)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundColor: 'rgba(0, 128, 128, 0.6)',
+        backgroundBlendMode: 'overlay',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: '20px',
+      }}
+    >
+      <Card
+        sx={{
+          maxWidth: 900,
+          width: '100%',
+          backgroundColor: 'rgba(0, 0, 0, 0.7)',
+          color: '#fff',
+          boxShadow: '0px 4px 15px rgba(0, 0, 0, 0.5)',
+          padding: '20px',
+        }}
+      >
+        <CardContent>
+          <Typography variant="h5" align="center" gutterBottom>
+            Gestión de Financiamiento
+          </Typography>
 
-      {selectedAccountId && (
-        <div>
-          <h3>Historial de Pagos para la Cuenta ID: {selectedAccountId}</h3>
-          <table>
-            <thead>
-              <tr>
-                <th>ID Pago</th>
-                <th>Monto</th>
-                <th>Fecha de Pago</th>
-              </tr>
-            </thead>
-            <tbody>
-              {paymentHistory.map((payment) => (
-                <tr key={payment.id}>
-                  <td>{payment.id}</td>
-                  <td>{payment.amount}</td>
-                  <td>{payment.payment_date}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+          {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+
+          <Typography variant="h6" gutterBottom>
+            Informe de Cuentas por Cobrar
+          </Typography>
+          <TableContainer component={Paper} sx={{ backgroundColor: 'rgba(0, 0, 0, 0.6)', mt: 2 }}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell sx={{ color: '#80cbc4' }}>ID Cliente</TableCell>
+                  <TableCell sx={{ color: '#80cbc4' }}>Nombre</TableCell>
+                  <TableCell sx={{ color: '#80cbc4' }}>Saldo Pendiente</TableCell>
+                  <TableCell sx={{ color: '#80cbc4' }}>Acciones</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {accounts.map((account) => (
+                  <TableRow key={account.client_id}>
+                    <TableCell sx={{ color: '#fff' }}>{account.client_id}</TableCell>
+                    <TableCell sx={{ color: '#fff' }}>{account.name}</TableCell>
+                    <TableCell sx={{ color: '#fff' }}>{account.balance}</TableCell>
+                    <TableCell>
+                      <TextField
+                        type="number"
+                        placeholder="Monto del Pago"
+                        value={amountPaid}
+                        onChange={(e) => setAmountPaid(e.target.value)}
+                        sx={{ backgroundColor: '#fff', borderRadius: '5px', marginRight: 1 }}
+                        InputProps={{ inputProps: { min: 0 } }}
+                      />
+                      <TextField
+                        type="date"
+                        placeholder="Fecha de Pago"
+                        value={paymentDate}
+                        onChange={(e) => setPaymentDate(e.target.value)}
+                        sx={{ backgroundColor: '#fff', borderRadius: '5px', marginRight: 1 }}
+                      />
+                      <Button
+                        variant="contained"
+                        onClick={() => handlePayment(account.client_id)}
+                        sx={{ backgroundColor: '#4caf50', marginRight: 1 }}
+                      >
+                        Registrar Pago
+                      </Button>
+                      <Button
+                        variant="contained"
+                        onClick={() => fetchPaymentHistory(account.client_id)}
+                        sx={{ backgroundColor: '#1976d2' }}
+                      >
+                        Ver Historial de Pagos
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+
+          {selectedAccountId && (
+            <Box sx={{ mt: 4 }}>
+              <Typography variant="h6">
+                Historial de Pagos para la Cuenta ID: {selectedAccountId}
+              </Typography>
+              <TableContainer component={Paper} sx={{ backgroundColor: 'rgba(0, 0, 0, 0.6)', mt: 2 }}>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell sx={{ color: '#80cbc4' }}>ID Pago</TableCell>
+                      <TableCell sx={{ color: '#80cbc4' }}>Monto</TableCell>
+                      <TableCell sx={{ color: '#80cbc4' }}>Fecha de Pago</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {paymentHistory.map((payment) => (
+                      <TableRow key={payment.id}>
+                        <TableCell sx={{ color: '#fff' }}>{payment.id}</TableCell>
+                        <TableCell sx={{ color: '#fff' }}>{payment.amount}</TableCell>
+                        <TableCell sx={{ color: '#fff' }}>{payment.payment_date}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Box>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }
 
 export default AccountsReceivableManagement;
+

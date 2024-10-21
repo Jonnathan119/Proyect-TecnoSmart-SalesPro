@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import {
+  Box, Button, Card, CardContent, TextField, Typography, MenuItem, Select, InputLabel, FormControl, Checkbox, FormControlLabel, Alert,
+} from '@mui/material';
 
 function SalesManagement() {
   const [clients, setClients] = useState([]);
   const [products, setProducts] = useState([]);
   const [selectedProducts, setSelectedProducts] = useState([]);
-  const [client, setClient] = useState(null);
-  const [isCredit, setIsCredit] = useState(false); // Estado para la venta a crédito
+  const [client, setClient] = useState('');
+  const [isCredit, setIsCredit] = useState(false);
   const [error, setError] = useState('');
   const [showSummary, setShowSummary] = useState(false);
 
@@ -38,10 +41,10 @@ function SalesManagement() {
     }
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     setError('');
-    setShowSummary(true); // Mostrar el resumen antes de confirmar
+    setShowSummary(true);
   };
 
   const handleConfirmSale = async () => {
@@ -53,25 +56,24 @@ function SalesManagement() {
           quantity: p.quantity,
           price: p.price,
         })),
-        is_credit: isCredit, // Incluir si la venta es a crédito
+        is_credit: isCredit,
       };
-      
+
       console.log('Datos de la venta enviados:', saleData);
 
       await axios.post('http://localhost:5002/api/sales', saleData);
       alert('Venta registrada exitosamente');
-      setSelectedProducts([]); // Limpiar el formulario después de confirmar
-      setShowSummary(false); // Ocultar el resumen después de confirmar
-      setIsCredit(false); // Resetear el estado de la venta a crédito
+      setSelectedProducts([]);
+      setShowSummary(false);
+      setIsCredit(false);
     } catch (error) {
       console.error('Error al registrar la venta:', error.response?.data || error.message);
-      // Mostrar mensaje de error si el stock es insuficiente o hay otro error
       setError(error.response?.data?.message || 'Error al registrar la venta');
     }
   };
 
   const handleCancelSale = () => {
-    setShowSummary(false); // Ocultar el resumen y permitir nuevas modificaciones
+    setShowSummary(false);
   };
 
   const calculateTotal = () => {
@@ -82,71 +84,140 @@ function SalesManagement() {
   };
 
   return (
-    <div>
-      <h2>Registrar Venta</h2>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+    <div
+      style={{
+        minHeight: '100vh',
+        backgroundImage: 'url(/images/background.jpg)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundColor: 'rgba(0, 128, 128, 0.6)',
+        backgroundBlendMode: 'overlay',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: '20px',
+      }}
+    >
+      <Card
+        sx={{
+          maxWidth: 600,
+          width: '100%',
+          backgroundColor: 'rgba(0, 0, 0, 0.7)',
+          color: '#fff',
+          boxShadow: '0px 4px 15px rgba(0, 0, 0, 0.5)',
+        }}
+      >
+        <CardContent>
+          <Typography variant="h5" align="center" gutterBottom>
+            Registrar Venta
+          </Typography>
+          {error && <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>}
 
-      {!showSummary ? (
-        <form onSubmit={handleSubmit}>
-          <div>
-            <label>Cliente:</label>
-            <select onChange={(e) => setClient(e.target.value)} required>
-              <option value="">Seleccionar Cliente</option>
-              {clients.map((client) => (
-                <option key={client.id} value={client.id}>
-                  {client.name}
-                </option>
+          {!showSummary ? (
+            <form onSubmit={handleSubmit}>
+              <FormControl fullWidth margin="normal">
+                <InputLabel style={{ color: '#ccc' }}>Cliente</InputLabel>
+                <Select
+                  value={client}
+                  onChange={(e) => setClient(e.target.value)}
+                  style={{
+                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                    color: '#fff',
+                  }}
+                  required
+                >
+                  <MenuItem value="">
+                    <em>Seleccionar Cliente</em>
+                  </MenuItem>
+                  {clients.map((client) => (
+                    <MenuItem key={client.id} value={client.id}>
+                      {client.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+
+              {products.map((product) => (
+                <Box key={product.id} sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                  <Typography sx={{ flexGrow: 1 }}>
+                    {product.name} - {product.price} (Stock: {product.quantity})
+                  </Typography>
+                  <TextField
+                    type="number"
+                    placeholder="Cantidad"
+                    inputProps={{ min: 1, max: product.quantity }}
+                    sx={{ width: '100px', backgroundColor: 'rgba(255, 255, 255, 0.1)', color: '#fff' }}
+                    onChange={(e) =>
+                      handleAddProduct(product, parseInt(e.target.value, 10))
+                    }
+                  />
+                </Box>
               ))}
-            </select>
-          </div>
 
-          <div>
-            <label>Productos:</label>
-            {products.map((product) => (
-              <div key={product.id}>
-                <span>{product.name} - {product.price}</span>
-                <input
-                  type="number"
-                  placeholder="Cantidad"
-                  min="1"
-                  max={product.quantity} // Mostrar el stock máximo disponible
-                  onChange={(e) =>
-                    handleAddProduct(product, parseInt(e.target.value, 10))
-                  }
-                />
-              </div>
-            ))}
-          </div>
-
-          <div>
-            <label>
-              <input
-                type="checkbox"
-                checked={isCredit}
-                onChange={(e) => setIsCredit(e.target.checked)}
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={isCredit}
+                    onChange={(e) => setIsCredit(e.target.checked)}
+                    sx={{ color: '#80cbc4' }}
+                  />
+                }
+                label="Venta a Crédito"
+                style={{ color: '#80cbc4' }}
               />
-              Venta a Crédito
-            </label>
-          </div>
 
-          <button type="submit">Ver Resumen</button>
-        </form>
-      ) : (
-        <div>
-          <h3>Resumen de la Venta</h3>
-          <ul>
-            {selectedProducts.map((product) => (
-              <li key={product.id}>
-                {product.name} - {product.quantity} unidades - Precio unitario: {product.price} - Total: {product.price * product.quantity}
-              </li>
-            ))}
-          </ul>
-          <h4>Total de la venta: {calculateTotal()}</h4>
-          <p>{isCredit ? 'Esta venta será registrada como crédito.' : 'Esta venta será al contado.'}</p>
-          <button onClick={handleConfirmSale}>Confirmar Venta</button>
-          <button onClick={handleCancelSale}>Cancelar</button>
-        </div>
-      )}
+              <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+                fullWidth
+                sx={{ mt: 3, backgroundColor: '#00796b' }}
+              >
+                Ver Resumen
+              </Button>
+            </form>
+          ) : (
+            <div>
+              <Typography variant="h6" align="center" gutterBottom>
+                Resumen de la Venta
+              </Typography>
+              <Box sx={{ mt: 2 }}>
+                {selectedProducts.map((product) => (
+                  <Box key={product.id} sx={{ mb: 1 }}>
+                    <Typography>
+                      {product.name} - {product.quantity} unidades - Precio unitario: {product.price} - Total: {product.price * product.quantity}
+                    </Typography>
+                  </Box>
+                ))}
+                <Typography variant="h6" sx={{ mt: 2 }}>
+                  Total de la venta: {calculateTotal()}
+                </Typography>
+                <Typography sx={{ mt: 1 }}>
+                  {isCredit ? 'Esta venta será registrada como crédito.' : 'Esta venta será al contado.'}
+                </Typography>
+              </Box>
+              <Button
+                onClick={handleConfirmSale}
+                variant="contained"
+                color="primary"
+                fullWidth
+                sx={{ mt: 3, backgroundColor: '#00796b' }}
+              >
+                Confirmar Venta
+              </Button>
+              <Button
+                onClick={handleCancelSale}
+                variant="outlined"
+                color="secondary"
+                fullWidth
+                sx={{ mt: 2 }}
+              >
+                Cancelar
+              </Button>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

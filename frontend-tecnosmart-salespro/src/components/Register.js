@@ -1,34 +1,34 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import {
-  Box, Button, Card, CardContent, TextField, Typography, Alert,
+  Box, Button, Card, CardContent, TextField, Typography, Alert, MenuItem,
 } from '@mui/material';
 
-function Login() {
+function Register() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [role, setRole] = useState('');
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
+    setError('');
+    setSuccess('');
 
     try {
-      const response = await axios.post('http://localhost:5002/api/auth/login', {
+      await axios.post('http://localhost:5002/api/auth/register', {
         email,
         password,
+        role,
       });
 
-      const { token, user } = response.data;
-
-      // Guardar el token en localStorage
-      localStorage.setItem('token', token);
-
-      // Redirigir al dashboard
-      navigate('/dashboard');
+      setSuccess('Registro exitoso. Redirigiendo a inicio de sesión...');
+      setTimeout(() => navigate('/login'), 3000); // Redirigir después de 3 segundos
     } catch (err) {
-      setError('Credenciales incorrectas');
+      setError(err.response?.data?.message || 'Error al registrar. Intente nuevamente.');
     }
   };
 
@@ -58,9 +58,9 @@ function Login() {
       >
         <CardContent>
           <Typography variant="h5" align="center" gutterBottom>
-            Inicio de Sesión
+            Registro de Usuario
           </Typography>
-          <form onSubmit={handleLogin}>
+          <form onSubmit={handleRegister}>
             <TextField
               label="Email"
               type="email"
@@ -87,7 +87,24 @@ function Login() {
                 style: { color: '#fff', backgroundColor: 'rgba(255, 255, 255, 0.1)' },
               }}
             />
+            <TextField
+              label="Rol"
+              select
+              variant="outlined"
+              fullWidth
+              margin="normal"
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+              InputLabelProps={{ style: { color: '#ccc' } }}
+              InputProps={{
+                style: { color: '#fff', backgroundColor: 'rgba(255, 255, 255, 0.1)' },
+              }}
+            >
+              <MenuItem value="admin">Administrador</MenuItem>
+              <MenuItem value="user">Usuario</MenuItem>
+            </TextField>
             {error && <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>}
+            {success && <Alert severity="success" sx={{ mt: 2 }}>{success}</Alert>}
             <Button
               type="submit"
               variant="contained"
@@ -95,31 +112,13 @@ function Login() {
               fullWidth
               sx={{ mt: 3, backgroundColor: '#00796b' }}
             >
-              Iniciar Sesión
+              Registrarse
             </Button>
           </form>
-          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
-            <Button
-              onClick={() => navigate('/register')}
-              variant="text"
-              sx={{ color: '#80cbc4' }}
-            >
-              Crear una cuenta en Tecnosmart:
-            </Button>
-          </Box>
-          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
-            <Button
-              onClick={() => navigate('/forgot-password')}
-              variant="text"
-              sx={{ color: '#80cbc4' }}
-            >
-              Recuperar contraseña:
-            </Button>
-          </Box>
         </CardContent>
       </Card>
     </div>
   );
 }
 
-export default Login;
+export default Register;
