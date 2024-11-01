@@ -105,6 +105,7 @@ function InventoryManagement() {
           <form onSubmit={handleSubmit}>
             <TextField
               label="Nombre del Producto"
+              name= "Nombre del Producto"
               variant="outlined"
               fullWidth
               margin="normal"
@@ -116,6 +117,7 @@ function InventoryManagement() {
             />
             <TextField
               label="Descripción"
+              name= "Descripción"
               variant="outlined"
               fullWidth
               margin="normal"
@@ -126,6 +128,7 @@ function InventoryManagement() {
             />
             <TextField
               label="Precio"
+              name= "Precio"
               variant="outlined"
               fullWidth
               margin="normal"
@@ -138,6 +141,7 @@ function InventoryManagement() {
             />
             <TextField
               label="Cantidad"
+              name="Cantidad"
               variant="outlined"
               fullWidth
               margin="normal"
@@ -150,6 +154,7 @@ function InventoryManagement() {
             />
             <TextField
               label="Categoría"
+              name= "Categoría"
               variant="outlined"
               fullWidth
               margin="normal"
@@ -196,6 +201,7 @@ function InventoryManagement() {
                     <TableCell>
                       <Button
                         variant="contained"
+                        name= "Editar"
                         color="primary"
                         size="small"
                         onClick={() => handleEdit(product)}

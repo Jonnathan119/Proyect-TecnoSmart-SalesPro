@@ -119,6 +119,7 @@ function ClientManagement() {
           <form onSubmit={handleSubmit}>
             <TextField
               label="Número de Cédula"
+              name="Número de Cédula"
               variant="outlined"
               fullWidth
               margin="normal"
@@ -130,6 +131,7 @@ function ClientManagement() {
             />
             <TextField
               label="Nombre del Cliente"
+              name="Nombre del Cliente"
               variant="outlined"
               fullWidth
               margin="normal"
@@ -141,6 +143,7 @@ function ClientManagement() {
             />
             <TextField
               label="Fecha de Expedición"
+              name="Fecha de Expedición"
               variant="outlined"
               type="date"
               fullWidth
@@ -152,6 +155,7 @@ function ClientManagement() {
             />
             <TextField
               label="Lugar de Expedición"
+              name="Lugar de Expedición"
               variant="outlined"
               fullWidth
               margin="normal"
@@ -162,6 +166,7 @@ function ClientManagement() {
             />
             <TextField
               label="Correo"
+              name="Correo"
               variant="outlined"
               fullWidth
               margin="normal"
@@ -173,6 +178,7 @@ function ClientManagement() {
             />
             <TextField
               label="Teléfono"
+              name="Teléfono"
               variant="outlined"
               fullWidth
               margin="normal"
@@ -183,6 +189,7 @@ function ClientManagement() {
             />
             <TextField
               label="Dirección"
+              name="Dirección"
               variant="outlined"
               fullWidth
               margin="normal"
@@ -193,6 +200,7 @@ function ClientManagement() {
             />
             <Button
               type="submit"
+              name="submit"
               variant="contained"
               color="primary"
               fullWidth
